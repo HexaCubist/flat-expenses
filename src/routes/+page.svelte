@@ -260,7 +260,7 @@
 				data: Object.entries(activityByDay).map(([d, t]) => ({
 					x: DateTime.fromISO(d),
 					y: t.reduce((acc, t) => {
-						if (isUtilityTx(t) === false) {
+						if (isUtilityTx(t) === false && !isLandlordTx(t) && !isPersonRent(t)) {
 							return acc + t.amount;
 						}
 						return acc;
