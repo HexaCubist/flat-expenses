@@ -366,16 +366,16 @@
 								{person.name}
 								<div class="float-right">
 									{#if balance > 0}
-										<span class="badge badge-outline badge-success">
+										<span class="badge-simple badge-success">
 											▲
 											{formatDollars.format(balance)}
 										</span>
 									{:else if balance === 0}
-										<span class="badge badge-outline">
+										<span class="badge-simple">
 											{formatDollars.format(balance)}
 										</span>
 									{:else}
-										<span class="badge badge-outline badge-error">
+										<span class="badge-simple badge-error">
 											▼
 											{formatDollars.format(balance)}
 										</span>
@@ -393,12 +393,12 @@
 								{week.week.toRelative({ unit: 'weeks' })}
 								<br />
 								{#if week.change > 0}
-									<span class="badge badge-outline badge-success">
+									<span class="badge-simple badge-success">
 										▲
 										{formatDollars.format(week.change)}
 									</span>
 								{:else}
-									<span class="badge badge-outline badge-error">
+									<span class="badge-simple badge-error">
 										▼
 										{formatDollars.format(week.change)}
 									</span>
@@ -406,7 +406,7 @@
 							</th>
 							{#each people as person}
 								{@const personData = week.flatmateTx[person.name]}
-								<td class="relative">
+								<td class="relative sm:align-top align-middle sm:text-left text-center leading-6">
 									{#if personData.rent}
 										<div class="tooltip" data-tip={formatDollars.format(personData.rent)}>
 											<span class="badge badge-lg">🏡</span>
@@ -445,7 +445,9 @@
 								<div class="flex flex-wrap gap-1">
 									{#each week.otherTx as tx}
 										<div class="tooltip" data-tip={tx.description}>
-											<span class="badge w-full">{formatDollars.format(tx.amount)}</span>
+											<span class="badge badge-xs sm:text-base sm:badge-md w-full"
+												>{formatDollars.format(tx.amount)}</span
+											>
 										</div>
 									{/each}
 								</div>
@@ -464,3 +466,10 @@
 		</div>
 	</div>
 </div>
+
+<style lang="postcss">
+	.badge-simple {
+		@apply badge badge-outline badge-sm sm:text-base sm:badge-md;
+		@apply truncate;
+	}
+</style>
