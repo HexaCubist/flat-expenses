@@ -14,7 +14,7 @@ const account = accounts.find((account) => account.name === account_name);
 
 if (!account) throw new Error(`No account found with name "${account_name}"`);
 
-export const load: PageServerLoad = async ({ params }) => {
+export const load: PageServerLoad = async ({ params, setHeaders }) => {
 	const start = DateTime.now()
 		.set({ hour: 0, minute: 0, second: 0, millisecond: 0 })
 		.minus({ days: 90 })
@@ -43,6 +43,11 @@ export const load: PageServerLoad = async ({ params }) => {
 		query.cursor = page.cursor.next;
 		// Continue until the server returns a null cursor
 	} while (query.cursor !== null);
+
+	setHeaders({
+		'X-Robots-Tag': 'noindex',
+		'cache-control': 'public, max-age 43200, s-maxage=43200, stale-while-revalidate=43200'
+	});
 
 	return {
 		account: {
