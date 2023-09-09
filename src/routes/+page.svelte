@@ -408,7 +408,7 @@
 								{@const personData = week.flatmateTx[person.name]}
 								<td class="relative">
 									{#if personData.rent}
-										<div class="tooltip" data-tip={personData.rent}>
+										<div class="tooltip" data-tip={formatDollars.format(personData.rent)}>
 											<span class="badge badge-lg">🏡</span>
 										</div>
 									{:else}
@@ -425,7 +425,7 @@
 												<span class="badge badge-lg badge-info">🧾</span>
 											</div>
 										{:else}
-											<div class="tooltip" data-tip={personData.utility}>
+											<div class="tooltip" data-tip={formatDollars.format(personData.utility)}>
 												<span class="badge badge-lg">🧾</span>
 											</div>
 										{/if}
