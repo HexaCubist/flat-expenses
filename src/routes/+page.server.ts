@@ -7,18 +7,18 @@ import fetchAdapter from '@haverstack/axios-fetch-adapter';
 const { app_token, user_token, account_name } = env;
 
 if (!app_token || !user_token || !account_name) throw new Error('Missing Akahu tokens');
-
 const akahu = new AkahuClient({
 	appToken: app_token,
-	adapter: fetchAdapter
+	//@ts-expect-error
+	adapter: fetchAdapter.default as typeof fetchAdapter
 });
-const user = await akahu.users.get(user_token);
-const accounts = await akahu.accounts.list(user_token);
-const account = accounts.find((account) => account.name === account_name);
-
-if (!account) throw new Error(`No account found with name "${account_name}"`);
 
 export const load: PageServerLoad = async ({ params, setHeaders }) => {
+	const user = await akahu.users.get(user_token);
+	const accounts = await akahu.accounts.list(user_token);
+	const account = accounts.find((account) => account.name === account_name);
+
+	if (!account) throw new Error(`No account found with name "${account_name}"`);
 	const start = DateTime.now()
 		.set({ hour: 0, minute: 0, second: 0, millisecond: 0 })
 		.minus({ days: 90 })
