@@ -9,8 +9,7 @@ const { app_token, user_token, account_name } = env;
 if (!app_token || !user_token || !account_name) throw new Error('Missing Akahu tokens');
 const akahu = new AkahuClient({
 	appToken: app_token,
-	//@ts-expect-error
-	adapter: fetchAdapter.default as typeof fetchAdapter
+	adapter: fetchAdapter
 });
 
 export const load: PageServerLoad = async ({ params, setHeaders }) => {
