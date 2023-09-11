@@ -2,12 +2,16 @@ import type { PageServerLoad } from './$types';
 import { env } from '$env/dynamic/private';
 import { AkahuClient, type Transaction, type TransactionQueryParams } from 'akahu';
 import { DateTime } from 'luxon';
+import fetchAdapter from '@haverstack/axios-fetch-adapter';
 
 const { app_token, user_token, account_name } = env;
 
 if (!app_token || !user_token || !account_name) throw new Error('Missing Akahu tokens');
 
-const akahu = new AkahuClient({ appToken: app_token });
+const akahu = new AkahuClient({
+	appToken: app_token,
+	adapter: fetchAdapter
+});
 const user = await akahu.users.get(user_token);
 const accounts = await akahu.accounts.list(user_token);
 const account = accounts.find((account) => account.name === account_name);

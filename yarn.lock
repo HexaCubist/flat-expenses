@@ -125,6 +125,11 @@
   resolved "https://registry.yarnpkg.com/@esbuild/win32-x64/-/win32-x64-0.18.20.tgz#786c5f41f043b07afb1af37683d7c33668858f6d"
   integrity sha512-kTdfRcSiDfQca/y9QIkng02avJ+NCaQvrMejlsB3RRv5sE9rRoeBPISaZpKxHELzRxZyLvNts1P27W3wV+8geQ==
 
+"@haverstack/axios-fetch-adapter@^0.8.0":
+  version "0.8.0"
+  resolved "https://registry.yarnpkg.com/@haverstack/axios-fetch-adapter/-/axios-fetch-adapter-0.8.0.tgz#c9e80c29e565c65876c3312fa115d12f4cca4000"
+  integrity sha512-49/VcEVNusdkpaejbBx0EyESK2YR4L2oWfANp2FwYxJcE8gIfK86rcRhBt5RcGtZpTcfEwpflqyrT2S6yZnPDw==
+
 "@iarna/toml@^2.2.5":
   version "2.2.5"
   resolved "https://registry.yarnpkg.com/@iarna/toml/-/toml-2.2.5.tgz#b32366c89b43c6f8cefbdefac778b9c828e3ba8c"
@@ -273,10 +278,10 @@ acorn@^8.10.0, acorn@^8.9.0:
   resolved "https://registry.yarnpkg.com/acorn/-/acorn-8.10.0.tgz#8be5b3907a67221a81ab23c7889c4c5526b62ec5"
   integrity sha512-F0SAmZ8iUtS//m8DmCTA0jlh6TDKkHQyK6xc6V4KDTyZKA9dnvX9/3sRTVQrWm79glUAZbnmmNcdYwUIHWVybw==
 
-akahu@^1.13.0:
-  version "1.13.0"
-  resolved "https://registry.yarnpkg.com/akahu/-/akahu-1.13.0.tgz#e04118c37ba98f226e493101c540cb4ee3a5dbe0"
-  integrity sha512-Yq9LKoovLerHgtuaQ/bTWMOzSNU/8s3+MZZxnoahe6yAPD/MOuQuzFxLepQlGAn8OouRdXny1X2TSou2m0znLw==
+akahu@^1.14.0:
+  version "1.14.0"
+  resolved "https://registry.yarnpkg.com/akahu/-/akahu-1.14.0.tgz#a7f351a9aa159afe7a8ce20bb71f35c070bc7290"
+  integrity sha512-le7YzfgsGqiqA3N/VL10VUvUB5BJttmIOMGckJE72A4nVa4Ta+MtCLKMV+hHVK3K9G3zdPZMsGd/wlu2C7zfLQ==
   dependencies:
     axios "^0.21.1"
     tslib "^2.3.0"
