@@ -143,13 +143,8 @@
 
 	$: richWeekData = timePeriodWeeks.map((week) => {
 		const weekTransactions = data.transactions.filter((t) => {
-			const date = DateTime.fromISO(t.date as string).set({
-				hour: 0,
-				minute: 0,
-				second: 0,
-				millisecond: 0
-			});
-			return date >= week.minus({ weeks: 1 }) && date < week;
+			const date = DateTime.fromISO(t.date as string).startOf('day');
+			return date >= week.startOf('week') && date <= week.endOf('week');
 		});
 		const flatmateTx = people.reduce((acc, person) => {
 			const personTransactions = weekTransactions.filter((t) =>
@@ -389,7 +384,7 @@
 				<tbody>
 					{#each richWeekData.reverse() as week}
 						<tr>
-							<th>
+							<th title={week.week.toLocaleString()}>
 								{week.week.toRelative({ unit: 'weeks' })}
 								<br />
 								{#if week.change > 0}
