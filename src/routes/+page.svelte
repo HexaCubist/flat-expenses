@@ -53,11 +53,11 @@
 	const isPersonTx = (tx: { description: string }) => {
 		return people.find((p) => tx.description.toLowerCase().includes(p.name.toLowerCase()));
 	};
-	const isPersonRent = (tx: { description: string; amount?: number }) => {
+	const isPersonRent = (tx: { description: string; amount?: number }, loose = false) => {
 		return people.find(
 			(p) =>
 				isPersonTx(tx) &&
-				tx.description.toLowerCase().includes('rent') &&
+				(loose || tx.description.toLowerCase().includes('rent')) &&
 				tx.amount &&
 				tx.amount >= p.rent
 		);
@@ -222,7 +222,7 @@
 				data: Object.entries(activityByDay).map(([d, t]) => ({
 					x: DateTime.fromISO(d),
 					y: t.reduce((acc, t) => {
-						if (isPersonRent(t)) {
+						if (isPersonRent(t, true)) {
 							return acc + t.amount;
 						}
 						return acc;
@@ -266,7 +266,7 @@
 				data: Object.entries(activityByDay).map(([d, t]) => ({
 					x: DateTime.fromISO(d),
 					y: t.reduce((acc, t) => {
-						if (isUtilityTx(t) === false && !isLandlordTx(t) && !isPersonRent(t)) {
+						if (isUtilityTx(t) === false && !isLandlordTx(t) && !isPersonRent(t, true)) {
 							return acc + t.amount;
 						}
 						return acc;
