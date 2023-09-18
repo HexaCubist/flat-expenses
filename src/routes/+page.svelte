@@ -152,6 +152,17 @@
 			);
 			let RentTx = personTransactions.find((t) => isPersonRent(t))?.amount || false;
 			let UtilityTx = personTransactions.find((t) => isPersonUtility(t))?.amount || false;
+			let OtherTx = personTransactions
+				.filter((t) => !isPersonRent(t) && !isPersonUtility(t))
+				.reduce((acc, t) => acc + t.amount, 0);
+			if (RentTx === false && OtherTx > person.rent) {
+				RentTx = person.rent;
+				OtherTx -= person.rent;
+			}
+			if (UtilityTx === false && OtherTx > utility_cost) {
+				UtilityTx = utility_cost;
+				OtherTx -= utility_cost;
+			}
 			if ((RentTx || 0) >= person.rent + utility_cost) {
 				UtilityTx = (RentTx || 0) - person.rent;
 				RentTx = person.rent;
