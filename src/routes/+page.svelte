@@ -116,7 +116,7 @@
 		.reverse();
 	// env.PUBLIC_START_DATE == 1701082800
 	$: richDataRange = Math.max(
-		Math.ceil(lastDate.diff(DateTime.fromSeconds(parseInt(env.PUBLIC_START_DATE))).weeks),
+		Math.ceil(lastDate.diff(DateTime.fromSeconds(parseInt(env.PUBLIC_START_DATE)), 'weeks').weeks),
 		1
 	);
 	$: richTimePeriodWeeks = Array.from(Array(richDataRange).keys()).map((i) =>
@@ -193,6 +193,23 @@
 			otherBalance,
 			change: weekTransactions.reduce((acc, t) => acc + t.amount, 0)
 		};
+	});
+
+	$: weeklyPersonRunningBalance = people.map((person) => {
+		// Array of balances for each week, starting from the first week and accumulating
+		return richWeekData?.reduce<number[]>(
+			(acc, week) => {
+				if (person.start > week.week) return acc;
+				return [
+					...acc,
+					acc[acc.length - 1] +
+						(week.flatmateTx[person.name].transactions.reduce((acc, t) => acc + t.amount, 0) || 0) -
+						person.rent -
+						utility_cost
+				];
+			},
+			[0]
+		);
 	});
 
 	let balanceData: ChartData<'line' | 'bar'>;
@@ -361,17 +378,11 @@
 				<thead>
 					<tr>
 						<th>Date</th>
-						{#each people as person}
-							{@const balance = richWeekData.reduce((acc, week) => {
-								if (person.start > week.week) return acc;
-								return (
-									acc +
-									(week.flatmateTx[person.name].rent || 0) +
-									(week.flatmateTx[person.name].utility || 0) -
-									person.rent -
-									utility_cost
-								);
-							}, 0)}
+						{#each people as person, personIndex}
+							{@const balance =
+								weeklyPersonRunningBalance[personIndex][
+									weeklyPersonRunningBalance[personIndex].length - 1
+								]}
 							<th>
 								{person.name}
 								<br />
@@ -399,7 +410,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					{#each richWeekData.reverse() as week}
+					{#each richWeekData.reverse() as week, weekIndex}
 						<tr>
 							<th title="Week starting {week.week.toLocaleString()}">
 								{week.week.toRelative({ unit: 'weeks' })}
@@ -416,13 +427,23 @@
 									</span>
 								{/if}
 							</th>
-							{#each people as person}
+							{#each people as person, personIndex}
+								{@const balance =
+									weeklyPersonRunningBalance[personIndex][
+										weeklyPersonRunningBalance[personIndex].length - 1 - weekIndex
+									]}
 								{@const personData = week.flatmateTx[person.name]}
+
 								<td class="relative sm:align-top align-middle sm:text-left text-center leading-6">
 									{#if personData.rent}
 										<div class="tooltip" data-tip={formatDollars.format(personData.rent)}>
 											<span class="badge badge-lg">🏡</span>
 										</div>
+									{:else if balance >= 0}
+										<span
+											class="badge badge-lg"
+											title="Person has positive balance - may have paid 2x rent last week">⏭️</span
+										>
 									{:else}
 										<span class="badge badge-lg">❌</span>
 									{/if}
@@ -436,11 +457,22 @@
 											>
 												<span class="badge badge-lg badge-info">🔋</span>
 											</div>
+										{:else if balance >= 0}
+											<span
+												class="badge badge-lg"
+												title="Person has positive balance - may have paid 2x rent last week"
+												>⏭️</span
+											>
 										{:else}
 											<div class="tooltip" data-tip={formatDollars.format(personData.utility)}>
 												<span class="badge badge-lg">🔋</span>
 											</div>
 										{/if}
+									{:else if balance >= 0}
+										<span
+											class="badge badge-lg"
+											title="Person has positive balance - may have paid 2x rent last week">⏭️</span
+										>
 									{:else}
 										<span class="badge badge-lg">❌</span>
 									{/if}
@@ -449,7 +481,9 @@
 										class="bg-base-200 bottom-0 left-0 right-0 mx-auto p-1 absolute rounded-t text-xs text-base-content text-opacity-70 font-bold"
 										style="width: calc(100% - 2rem);"
 									>
-										{formatDollars.format(personData.balance)}
+										Total: {formatDollars.format(personData.balance)} Balance: {formatDollars.format(
+											balance
+										)}
 									</div>
 								</td>
 							{/each}
