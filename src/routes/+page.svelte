@@ -374,6 +374,8 @@
 							}, 0)}
 							<th>
 								{person.name}
+								<br />
+								🏡{formatDollars.format(person.rent)} 🔋{formatDollars.format(utility_cost)}
 								<div class="float-right">
 									{#if balance > 0}
 										<span class="badge-simple badge-success">
@@ -432,11 +434,11 @@
 													personData.utility
 												)} - Greater than {formatDollars.format(utility_cost)}"
 											>
-												<span class="badge badge-lg badge-info">🧾</span>
+												<span class="badge badge-lg badge-info">🔋</span>
 											</div>
 										{:else}
 											<div class="tooltip" data-tip={formatDollars.format(personData.utility)}>
-												<span class="badge badge-lg">🧾</span>
+												<span class="badge badge-lg">🔋</span>
 											</div>
 										{/if}
 									{:else}
