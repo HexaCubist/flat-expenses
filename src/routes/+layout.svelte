@@ -18,6 +18,6 @@
 <style lang="postcss">
 	:global(body) {
 		@apply bg-cover bg-center min-h-screen;
-		background-image: url('./assets/flat.jpg');
+		background-image: url('./assets/tunnel.jpg');
 	}
 </style>

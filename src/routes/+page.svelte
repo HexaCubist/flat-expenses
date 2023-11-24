@@ -114,8 +114,12 @@
 	$: timePeriodDays = Array.from(Array(dayRange).keys())
 		.map((i) => lastDate.minus({ days: i }))
 		.reverse();
-	$: weekRange = Math.ceil(lastDate.diff(firstDate, 'weeks').weeks);
-	$: timePeriodWeeks = Array.from(Array(weekRange).keys())
+	// env.PUBLIC_START_DATE == 1701082800
+	$: richDataRange = Math.max(
+		1,
+		Math.ceil(lastDate.diff(DateTime.fromSeconds(parseInt(env.PUBLIC_START_DATE))).weeks)
+	);
+	$: richTimePeriodWeeks = Array.from(Array(richDataRange).keys())
 		.map((i) => lastDate.minus({ weeks: i }))
 		.reverse();
 
@@ -141,7 +145,7 @@
 		);
 	});
 
-	$: richWeekData = timePeriodWeeks.map((week) => {
+	$: richWeekData = richTimePeriodWeeks.map((week) => {
 		const weekTransactions = data.transactions.filter((t) => {
 			const date = DateTime.fromISO(t.date as string).startOf('day');
 			return date >= week.startOf('week') && date <= week.endOf('week');
