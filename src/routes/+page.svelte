@@ -116,12 +116,12 @@
 		.reverse();
 	// env.PUBLIC_START_DATE == 1701082800
 	$: richDataRange = Math.max(
-		1,
-		Math.ceil(lastDate.diff(DateTime.fromSeconds(parseInt(env.PUBLIC_START_DATE))).weeks)
+		Math.ceil(lastDate.diff(DateTime.fromSeconds(parseInt(env.PUBLIC_START_DATE))).weeks),
+		1
 	);
-	$: richTimePeriodWeeks = Array.from(Array(richDataRange).keys())
-		.map((i) => lastDate.minus({ weeks: i }))
-		.reverse();
+	$: richTimePeriodWeeks = Array.from(Array(richDataRange).keys()).map((i) =>
+		DateTime.fromSeconds(parseInt(env.PUBLIC_START_DATE)).plus({ weeks: i })
+	);
 
 	$: activityByDay = data.transactions.reduce<Record<string, typeof data.transactions>>(
 		(acc: any, t: any) => {
@@ -399,7 +399,7 @@
 				<tbody>
 					{#each richWeekData.reverse() as week}
 						<tr>
-							<th title={week.week.toLocaleString()}>
+							<th title="Week starting {week.week.toLocaleString()}">
 								{week.week.toRelative({ unit: 'weeks' })}
 								<br />
 								{#if week.change > 0}
