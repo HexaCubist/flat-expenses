@@ -47,16 +47,17 @@
 	const power_bundled = power === internet;
 	const utility_cost = Number(env.PUBLIC_UTILITIES);
 	const people = env.PUBLIC_PEOPLE_MAP.split(',').map((p) => {
-		const [name, rent, startTime, balanceChange = 0] = p.split(':');
+		const [name, rent, startTime, balanceChange = 0, account = name] = p.split(':');
 		return {
 			name,
+			account,
 			rent: Number(rent),
 			start: DateTime.fromSeconds(Number(startTime)),
 			balanceChange: Number(balanceChange)
 		};
 	});
 	const isPersonTx = (tx: { description: string }) => {
-		return people.find((p) => tx.description.toLowerCase().includes(p.name.toLowerCase()));
+		return people.find((p) => tx.description.toLowerCase().includes(p.account.toLowerCase()));
 	};
 	const isPersonRent = (tx: { description: string; amount?: number }, loose = false) => {
 		return people.find(
@@ -157,7 +158,7 @@
 		});
 		const flatmateTx = people.reduce((acc, person) => {
 			const personTransactions = weekTransactions.filter((t) =>
-				t.description.toLowerCase().includes(person.name.toLowerCase())
+				t.description.toLowerCase().includes(person.account.toLowerCase())
 			);
 			let RentTx = personTransactions.find((t) => isPersonRent(t))?.amount || false;
 			let UtilityTx = personTransactions.find((t) => isPersonUtility(t))?.amount || false;
@@ -188,7 +189,7 @@
 			};
 		}, {} as Record<string, { transactions: typeof weekTransactions; balance: number; rent: false | number; utility: false | number }>);
 		const otherTx = weekTransactions.filter(
-			(t) => !people.some((p) => t.description.toLowerCase().includes(p.name.toLowerCase()))
+			(t) => !people.some((p) => t.description.toLowerCase().includes(p.account.toLowerCase()))
 		);
 		const otherBalance = otherTx.reduce((acc, t) => acc + t.amount, 0);
 		return {
