@@ -47,8 +47,13 @@
 	const power_bundled = power === internet;
 	const utility_cost = Number(env.PUBLIC_UTILITIES);
 	const people = env.PUBLIC_PEOPLE_MAP.split(',').map((p) => {
-		const [name, rent, startTime] = p.split(':');
-		return { name, rent: Number(rent), start: DateTime.fromSeconds(Number(startTime)) };
+		const [name, rent, startTime, balanceChange = 0] = p.split(':');
+		return {
+			name,
+			rent: Number(rent),
+			start: DateTime.fromSeconds(Number(startTime)),
+			balanceChange: Number(balanceChange)
+		};
 	});
 	const isPersonTx = (tx: { description: string }) => {
 		return people.find((p) => tx.description.toLowerCase().includes(p.name.toLowerCase()));
@@ -208,7 +213,7 @@
 						utility_cost
 				];
 			},
-			[0]
+			[person.balanceChange * -1]
 		);
 	});
 
