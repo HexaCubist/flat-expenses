@@ -440,40 +440,24 @@
 									]}
 								{@const personData = week.flatmateTx[person.name]}
 
-								<td class="relative sm:align-top align-middle sm:text-left text-center leading-6">
-									{#if personData.rent}
-										<div class="tooltip" data-tip={formatDollars.format(personData.rent)}>
-											<span class="badge badge-lg">🏡</span>
-										</div>
-									{:else if balance >= 0}
-										<span
-											class="badge badge-lg"
-											title="Person has positive balance - may have paid 2x rent last week">⏭️</span
-										>
-									{:else}
-										<span class="badge badge-lg">❌</span>
-									{/if}
-									{#if personData.utility}
-										{#if personData.utility > Number(utility_cost)}
+								<td class="relative leading-6 align-bottom">
+									{#if personData.transactions.length > 0}
+										{#each personData.transactions as tx}
+											{@const hasBalance =
+												personData.balance - utility_cost - (personData.rent || 0) > 0}
 											<div
-												class="tooltip"
-												data-tip="{formatDollars.format(
-													personData.utility
-												)} - Greater than {formatDollars.format(utility_cost)}"
+												class="tooltip w-full block text-left"
+												data-tip="{tx.date}: {tx.description}"
 											>
-												<span class="badge badge-lg badge-info">🔋</span>
+												<span
+													class="badge badge-outline"
+													class:badge-error={!hasBalance}
+													class:badge-success={hasBalance && tx.amount > 0}
+												>
+													{formatDollars.format(tx.amount)}
+												</span>
 											</div>
-										{:else if balance >= 0}
-											<span
-												class="badge badge-lg"
-												title="Person has positive balance - may have paid 2x rent last week"
-												>⏭️</span
-											>
-										{:else}
-											<div class="tooltip" data-tip={formatDollars.format(personData.utility)}>
-												<span class="badge badge-lg">🔋</span>
-											</div>
-										{/if}
+										{/each}
 									{:else if balance >= 0}
 										<span
 											class="badge badge-lg"
@@ -482,10 +466,8 @@
 									{:else}
 										<span class="badge badge-lg">❌</span>
 									{/if}
-									<div class="h-5 w-full" />
 									<div
-										class="bg-base-200 bottom-0 left-0 right-0 mx-auto p-1 absolute rounded-t text-xs text-base-content text-opacity-70 font-bold"
-										style="width: calc(100% - 2rem);"
+										class="bg-base-200 w-full -ml-2 -mr-2 mt-2 relative p-1 rounded-t text-xs text-base-content text-opacity-70 font-bold"
 									>
 										Total: {formatDollars.format(personData.balance)} Balance: {formatDollars.format(
 											balance
