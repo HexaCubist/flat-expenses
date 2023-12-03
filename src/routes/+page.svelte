@@ -112,9 +112,10 @@
 	$: firstDate = sortedDates[0]?.date
 		? DateTime.fromISO(sortedDates[0]?.date)
 		: DateTime.now().minus({ days: 30 });
-	$: lastDate = sortedDates[sortedDates.length - 1]?.date
-		? DateTime.fromISO(sortedDates[sortedDates.length - 1]?.date)
-		: DateTime.now();
+	// $: lastDate = sortedDates[sortedDates.length - 1]?.date
+	// 	? DateTime.fromISO(sortedDates[sortedDates.length - 1]?.date)
+	// 	: DateTime.now();
+	const lastDate = DateTime.now();
 
 	$: dayRange = Math.ceil(lastDate.diff(firstDate, 'days').days);
 	$: timePeriodDays = Array.from(Array(dayRange).keys())
