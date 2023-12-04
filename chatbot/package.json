@@ -1,0 +1,11 @@
+{
+  "name": "flat-expenses-chat",
+  "version": "1.0.0",
+  "description": "A Facebook Messenger Bot for showing the current flat stuff",
+  "main": "index.js",
+  "author": "Zac M-W",
+  "license": "MIT",
+  "dependencies": {
+    "facebook-chat-api": "^1.8.0"
+  }
+}
