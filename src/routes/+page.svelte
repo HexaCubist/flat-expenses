@@ -445,7 +445,7 @@
 									{#if personData.transactions.length > 0}
 										{#each personData.transactions as tx}
 											{@const hasBalance =
-												personData.balance - utility_cost - (personData.rent || 0) > 0}
+												personData.balance - utility_cost - (personData.rent || 0) >= 0}
 											<div
 												class="tooltip w-full block text-left"
 												data-tip="{tx.date}: {tx.description}"
@@ -453,7 +453,7 @@
 												<span
 													class="badge badge-outline"
 													class:badge-error={!hasBalance}
-													class:badge-success={hasBalance && tx.amount > 0}
+													class:badge-success={hasBalance && tx.amount >= 0}
 												>
 													{formatDollars.format(tx.amount)}
 												</span>
