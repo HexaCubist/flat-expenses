@@ -349,6 +349,9 @@
 							y: {
 								beginAtZero: true,
 								stacked: true,
+								min: -2000,
+								max: 2500,
+
 								ticks: {
 									// Include a dollar sign in the ticks
 									callback: function (value, index, values) {
