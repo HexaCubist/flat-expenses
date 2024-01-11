@@ -23,7 +23,7 @@ const sendMessage = async () => {
 	const offsetChores = chores.slice(weekRot).concat(chores.slice(0, weekRot));
 	const message = offsetChores.map((chore, i) => `${people[i]}: ${chore}`).join('\n');
 	api.sendMessage(
-		`The chores for the coming week are:
+		`☸️ It's time to rotate the wheel! The chores for the coming week are:
 
 ${message}`,
 		thread

@@ -11,8 +11,8 @@ const bree = new Bree({
 		// 'bins-reminder'
 		{
 			name: 'chore-roster',
-			// At 2:14pm every Sunday
-			cron: '14 14 * * 0'
+			// At 7:14am every Monday
+			cron: '14 07 * * 1'
 		},
 		{
 			name: 'bins-reminder',
