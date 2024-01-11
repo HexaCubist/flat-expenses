@@ -1,0 +1,17 @@
+{
+	"schemaVersion": 2,
+	"dockerfileLines": [
+		"FROM node:20.10.0",
+		"WORKDIR /usr/src/app",
+		"COPY [\"./chatbot/package.json\", \"./chatbot/package-lock.json*\", \"./chatbot/npm-shrinkwrap.json*\", \"./chatbot/yarn.lock\", \"./\"]",
+		"RUN yarn",
+		"COPY ./chatbot/ .",
+		"ARG FB_THREAD",
+		"ENV FB_THREAD=$FB_THREAD",
+		"ARG FB_OWNER",
+		"ENV FB_OWNER=$FB_OWNER",
+		"ARG FB_APPSTATE",
+		"ENV FB_APPSTATE=$FB_APPSTATE",
+		"CMD node index.js"
+	]
+}
