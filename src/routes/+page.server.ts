@@ -24,6 +24,7 @@ export const load: PageServerLoad = async ({ params, setHeaders }) => {
 		.toUTC()
 		.toISO();
 	if (!start) throw new Error('Could not generate start date');
+
 	const transactions: Pick<Transaction, 'date' | 'description' | 'amount' | 'balance' | 'type'>[] =
 		[];
 	const query: TransactionQueryParams = { start };
