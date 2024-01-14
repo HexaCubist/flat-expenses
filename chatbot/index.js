@@ -12,12 +12,12 @@ const bree = new Bree({
 		{
 			name: 'chore-roster',
 			// At 7:14am every Monday
-			cron: '14 07 * * 1'
+			cron: process.env.CRON_CHORE_ROSTER
 		},
 		{
 			name: 'bins-reminder',
 			// Every evening at 4:30pm
-			cron: '30 16 * * *'
+			cron: process.env.CRON_BINS_REMINDER
 		}
 	]
 });
@@ -27,12 +27,12 @@ const graceful = new Graceful({ brees: [bree] });
 graceful.listen();
 bree.on('worker created', (name) => {
 	console.log('worker created', name);
-	console.log(bree.workers.get(name));
+	// console.log(bree.workers.get(name));
 });
 
 bree.on('worker deleted', (name) => {
 	console.log('worker deleted', name);
-	console.log(!bree.worker?.has(name));
+	// console.log(!bree.worker?.has(name));
 });
 
 (async () => {
