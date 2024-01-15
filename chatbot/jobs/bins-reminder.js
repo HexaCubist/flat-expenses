@@ -17,7 +17,7 @@ const sendMessage = async () => {
 	const isRecycling = root
 		.querySelectorAll('.card-content div.links')[0]
 		?.querySelector('.icon-recycle');
-	if (true || (now.date() + 1 === bins.date() && now.month() === bins.month())) {
+	if (now.date() + 1 === bins.date() && now.month() === bins.month()) {
 		const message = `🗑️${
 			isRecycling ? '♻️ The rubbish and recycling' : ' The rubbish'
 		} needs to go out tonight for collection tomorrow! Next week, the bins go out ${dayAfter}`;
