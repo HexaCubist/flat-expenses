@@ -18,11 +18,11 @@ export const load: PageServerLoad = async ({ params, setHeaders }) => {
 	const account = accounts.find((account) => account.name === account_name);
 
 	if (!account) throw new Error(`No account found with name "${account_name}"`);
-	const start = DateTime.now()
+	const startDate = DateTime.now()
 		.set({ hour: 0, minute: 0, second: 0, millisecond: 0 })
-		.minus({ days: 90 })
-		.toUTC()
-		.toISO();
+		.minus({ days: 80 })
+		.startOf('week');
+	const start = startDate.toUTC().toISO();
 	if (!start) throw new Error('Could not generate start date');
 
 	const transactions: Pick<Transaction, 'date' | 'description' | 'amount' | 'balance' | 'type'>[] =

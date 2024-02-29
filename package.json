@@ -16,6 +16,7 @@
 		"@sveltejs/kit": "^1.20.4",
 		"@types/luxon": "^3.3.2",
 		"autoprefixer": "^10.4.14",
+		"chartjs-plugin-trendline": "^2.1.0",
 		"daisyui": "^3.1.6",
 		"postcss": "^8.4.24",
 		"postcss-load-config": "^4.0.1",

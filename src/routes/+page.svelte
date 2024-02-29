@@ -13,6 +13,7 @@
 		LineElement,
 		Tooltip
 	} from 'chart.js';
+	import chartTrendline from 'chartjs-plugin-trendline';
 	import 'chart.js/auto';
 	import { page } from '$app/stores';
 	import type { PageData } from './$types';
@@ -38,7 +39,8 @@
 		PointElement,
 		BarElement,
 		LineElement,
-		CategoryScale
+		CategoryScale,
+		chartTrendline
 	);
 
 	$: data = $page.data as PageData;
@@ -66,7 +68,13 @@
 				})),
 				fill: false,
 				borderColor: 'rgb(75, 192, 192)',
-				tension: 0
+				tension: 0,
+				trendlineLinear: {
+					colorMin: 'red',
+					colorMax: 'green',
+					lineStyle: 'dotted',
+					width: 2
+				}
 			},
 			{
 				type: 'bar',
@@ -100,7 +108,13 @@
 						d.txOfTypes[flatTxType.internet].delta +
 						d.txOfTypes[flatTxType.power].delta +
 						d.txOfTypes[flatTxType.water].delta
-				}))
+				})),
+				trendlineLinear: {
+					colorMin: 'red',
+					colorMax: 'green',
+					lineStyle: 'solid',
+					width: 2
+				}
 			},
 			{
 				type: 'bar',
@@ -160,10 +174,10 @@
 							y: {
 								beginAtZero: true,
 								stacked: true,
-								min: -2000,
-								max: 2500,
-
 								ticks: {
+									major: {
+										enabled: true
+									},
 									// Include a dollar sign in the ticks
 									callback: function (value, index, values) {
 										if (typeof value === 'string') {

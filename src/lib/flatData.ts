@@ -48,7 +48,13 @@ export class Person {
 							// Starting balance charge
 							this.balanceAdjust +
 								//  Weekly rent and utilties since this.start
-								(this.rent + utility_cost) * Math.ceil(date.diff(this.start, 'weeks').weeks)
+								(this.rent + utility_cost) *
+									Math.ceil(
+										date.diff(
+											this.state.firstDate < this.start ? this.start : this.state.firstDate,
+											'weeks'
+										).weeks
+									)
 						)
 				) * 100
 			) / 100
