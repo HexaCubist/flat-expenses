@@ -19,6 +19,7 @@ export const load: PageServerLoad = async ({ params, setHeaders }) => {
 
 	if (!account) throw new Error(`No account found with name "${account_name}"`);
 	const startDate = DateTime.now()
+		.setZone(env.TZ || 'Pacific/Auckland')
 		.set({ hour: 0, minute: 0, second: 0, millisecond: 0 })
 		.minus({ days: 80 })
 		.startOf('week');
