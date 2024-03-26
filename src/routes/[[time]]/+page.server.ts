@@ -3,6 +3,7 @@ import { env } from '$env/dynamic/private';
 import { AkahuClient, type Transaction, type TransactionQueryParams } from 'akahu';
 import { DateTime } from 'luxon';
 import fetchAdapter from '@haverstack/axios-fetch-adapter';
+import { PUBLIC_START_DATE } from '$env/static/public';
 
 const { app_token, user_token, account_name } = env;
 
@@ -18,11 +19,44 @@ export const load: PageServerLoad = async ({ params, setHeaders }) => {
 	const account = accounts.find((account) => account.name === account_name);
 
 	if (!account) throw new Error(`No account found with name "${account_name}"`);
-	const startDate = DateTime.now()
+	let startDate = DateTime.now()
 		.setZone(env.TZ || 'Pacific/Auckland')
 		.set({ hour: 0, minute: 0, second: 0, millisecond: 0 })
 		.minus({ days: 80 })
 		.startOf('week');
+	switch (params.time) {
+		case 'days-30':
+			startDate = DateTime.now()
+				.setZone(env.TZ || 'Pacific/Auckland')
+				.set({ hour: 0, minute: 0, second: 0, millisecond: 0 })
+				.minus({ days: 30 })
+				.startOf('week');
+			break;
+		case 'start':
+			startDate = DateTime.fromSeconds(parseInt(PUBLIC_START_DATE))
+				.setZone(env.TZ || 'Pacific/Auckland')
+				.set({ hour: 0, minute: 0, second: 0, millisecond: 0 })
+				.minus({ days: 80 })
+				.startOf('week');
+			break;
+		case 'flat-start':
+			startDate = DateTime.fromSeconds(parseInt(PUBLIC_START_DATE))
+				.setZone(env.TZ || 'Pacific/Auckland')
+				.set({ hour: 0, minute: 0, second: 0, millisecond: 0 })
+				.startOf('week');
+			break;
+		default:
+			if (params.time) {
+				const newStartDate = DateTime.fromFormat(params.time, 'yyyy-MM-dd')
+					.setZone(env.TZ || 'Pacific/Auckland')
+					.set({ hour: 0, minute: 0, second: 0, millisecond: 0 })
+					.startOf('week');
+				if (newStartDate && newStartDate > DateTime.now().minus({ years: 1 })) {
+					startDate = newStartDate;
+				}
+			}
+			break;
+	}
 	const start = startDate.toUTC().toISO();
 	if (!start) throw new Error('Could not generate start date');
 
@@ -60,6 +94,7 @@ export const load: PageServerLoad = async ({ params, setHeaders }) => {
 			balance: account.balance,
 			refreshed: account.refreshed
 		},
-		transactions
+		transactions,
+		startDate: startDate.toISO()
 	};
 };

@@ -23,9 +23,9 @@ export class Person {
 	constructor(
 		private state: FlatData,
 		public name: string,
-		public rent: number,
+		public rent: RentAdjustment[],
 		public start: DateTime,
-		public balanceAdjust: number,
+		public balanceAdjust: BalanceAdjustment[],
 		public account: string
 	) {}
 	get balance(): number {
@@ -38,6 +38,8 @@ export class Person {
 				DateTime.fromISO(tx.date) <= date &&
 				DateTime.fromISO(tx.date) >= this.start
 		);
+		const startDate = this.state.firstDate < this.start ? this.start : this.state.firstDate;
+		console.log(this.state.firstDate.toSeconds(), this.balanceAdjust);
 		return (
 			Math.round(
 				txs.reduce(
@@ -46,15 +48,25 @@ export class Person {
 						Math.max(
 							0,
 							// Starting balance charge
-							this.balanceAdjust +
-								//  Weekly rent and utilties since this.start
-								(this.rent + utility_cost) *
-									Math.ceil(
-										date.diff(
-											this.state.firstDate < this.start ? this.start : this.state.firstDate,
-											'weeks'
-										).weeks
-									)
+							this.balanceAdjust
+								.filter((b) => b.date >= this.state.firstDate.toSeconds())
+								.reduce((acc, b) => b.amount + acc, 0) +
+								//  Weekly rent and utilties since startDate
+								// Loop over weeks since start
+								[...Array(Math.max(0, Math.ceil(date.diff(startDate, 'weeks').weeks)))].reduce(
+									(acc, _, i) => {
+										// First, get the date of the start of the week
+										const weekStart = startDate.plus({ weeks: i });
+										return (
+											acc +
+											(this.rent.find(
+												(r) => r.end_date === -1 || r.end_date >= weekStart.toSeconds()
+											)?.amount || 0) +
+											utility_cost
+										);
+									},
+									0
+								)
 						)
 				) * 100
 			) / 100
@@ -181,9 +193,27 @@ export class FlatTransaction
 	}
 }
 
+interface FlatDataOptions {
+	showAllTime: boolean;
+	startDate?: DateTime;
+}
+
+type BalanceAdjustment = { amount: number; date: number };
+type RentAdjustment = { amount: number; end_date: number };
+type PeopleEnvMap = Record<
+	string,
+	{
+		rent: RentAdjustment[];
+		start_date: number;
+		balance_adjustments: BalanceAdjustment[];
+		search_name: string;
+	}
+>;
+
 export class FlatData {
 	txs: FlatTransaction[];
 	people: Person[];
+	options: FlatDataOptions;
 	constructor(
 		public data: {
 			account: {
@@ -192,17 +222,23 @@ export class FlatData {
 				refreshed: AccountRefreshState | undefined;
 			};
 			transactions: Pick<Transaction, 'date' | 'description' | 'amount' | 'balance' | 'type'>[];
-		}
+		},
+		options: Partial<FlatDataOptions> = {}
 	) {
-		this.people = env.PUBLIC_PEOPLE_MAP.split(',').map((p) => {
-			const [name, rent, startTime, balanceAdjust = 0, account = name] = p.split(':');
+		this.options = {
+			showAllTime: false,
+			...options
+		};
+		// Parse PUBLIC_PEOPLE_MAP
+		const peopleMap = JSON.parse(env.PUBLIC_PEOPLE_MAP) as PeopleEnvMap;
+		this.people = Object.entries(peopleMap).map(([name, info]) => {
 			return new Person(
 				this,
 				name,
-				Number(rent),
-				DateTime.fromSeconds(Number(startTime)),
-				Number(balanceAdjust),
-				account
+				info.rent,
+				DateTime.fromSeconds(info.start_date),
+				info.balance_adjustments,
+				info.search_name
 			);
 		});
 		this.txs = data.transactions
@@ -216,8 +252,8 @@ export class FlatData {
 			? DateTime.fromISO(this.txs[0]?.date)
 			: DateTime.now().minus({ days: 30 });
 		// Case 1: first date at least one flatmate has moved in
-		if (this.people.find((p) => p.start <= realFirstDate)) {
-			return realFirstDate;
+		if (this.options.showAllTime || this.people.find((p) => p.start <= realFirstDate)) {
+			return this.options.startDate || realFirstDate;
 		}
 		// Case 2: first date no flatmate has moved in, return the first date a flatmate moves in
 		return this.people.map((p) => p.start).sort()[0];

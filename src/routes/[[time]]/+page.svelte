@@ -45,7 +45,7 @@
 
 	$: data = $page.data as PageData;
 
-	$: flatData = new FlatData(data);
+	$: flatData = new FlatData(data, { showAllTime: !!$page.params.time, startDate: DateTime.fromISO($page.data.startDate) });
 
 	const formatDollars = new Intl.NumberFormat('en-US', {
 		style: 'currency',
