@@ -37,8 +37,10 @@ const sendMessage = async () => {
 		api.sendMessage(message, thread);
 	} else {
 		console.log(
-			`The bins aren't going out tonight. The next time is ${nextDate} and ${
-				isRecycling ? 'the recycling bins are going out' : "the recycling bins aren't going out"
+			`The bins aren't going out tonight. The message will be ${prefix}:${listOfBins.join(
+				','
+			)}. The next time is ${nextDate} and ${
+				isRecycling ? 'the recycling bins are going out' : "the recycling bins aren't going out."
 			}`
 		);
 	}
