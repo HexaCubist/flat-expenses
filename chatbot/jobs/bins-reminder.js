@@ -4,32 +4,38 @@ require('dotenv').config();
 const fetch = require('node-fetch');
 const { parse } = require('node-html-parser');
 const dayjs = require('dayjs');
+const minMax = require('dayjs/plugin/minMax');
+dayjs.extend(minMax);
 
 const sendMessage = async () => {
 	const thread = process.env.FB_THREAD;
 	const res = await fetch(process.env.BIN_URL).then((res) => res.text());
 	const root = parse(res);
-	const now = dayjs();
+	const now = dayjs().set('h', 0).set('m', 0).set('s', 0);
 	const [rubbishDay, scrapDay, recyclingDay] = Array.from(
 		root.querySelectorAll('.collectionDayDate strong')
 	).map((c) => dayjs(c.textContent).set('y', now.year()));
-	const nextDate = dayjs(Math.min(rubbishDay, scrapDay, recyclingDay));
+	const nextDate = dayjs.min(rubbishDay, scrapDay, recyclingDay);
 	let prefix = '';
 	let listOfBins = [];
-	if (nextDate === rubbishDay) {
+	console.log(nextDate, rubbishDay);
+	if (nextDate.isSame(rubbishDay)) {
 		prefix = '🗑️';
 		listOfBins.push('rubbish');
 	}
-	if (nextDate === scrapDay) {
+	if (nextDate.isSame(scrapDay)) {
 		prefix = '🌿';
 		listOfBins.push('food scraps');
 	}
-	if (nextDate === recyclingDay) {
+	if (nextDate.isSame(recyclingDay)) {
 		prefix = '♻️';
 		listOfBins.push('recycling');
 	}
-	if (!nextDate) return;
-	if (now.add(1, 'd') >= bins) {
+	if (!nextDate) {
+		console.log('No bins found');
+		return;
+	}
+	if (now.add(1, 'd').isSame(nextDate)) {
 		const message = `${prefix} The ${listOfBins.join(
 			', '
 		)} need to go out tonight for collection tomorrow!`;
@@ -37,11 +43,12 @@ const sendMessage = async () => {
 		api.sendMessage(message, thread);
 	} else {
 		console.log(
-			`The bins aren't going out tonight. The message will be ${prefix}:${listOfBins.join(
+			`The bins aren't going out tonight. The next time is ${nextDate}. The current time is ${now} and will trigger on ${now.subtract(
+				1,
+				'd'
+			)}. The message will be ${prefix}:${listOfBins.join(
 				','
-			)}. The next time is ${nextDate} and ${
-				isRecycling ? 'the recycling bins are going out' : "the recycling bins aren't going out."
-			}`
+			)}. Details: Rubbish:${rubbishDay}, Scrap:${scrapDay}, Recycling:${recyclingDay}`
 		);
 	}
 };
