@@ -36,6 +36,6 @@
 <style lang="postcss">
 	:global(body) {
 		@apply bg-cover bg-center min-h-screen;
-		background-image: url('./assets/tunnel.jpg');
+		background-image: url('./assets/flat.webp');
 	}
 </style>
