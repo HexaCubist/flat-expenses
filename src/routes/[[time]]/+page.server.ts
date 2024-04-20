@@ -4,6 +4,7 @@ import { AkahuClient, type Transaction, type TransactionQueryParams } from 'akah
 import { DateTime } from 'luxon';
 import fetchAdapter from '@haverstack/axios-fetch-adapter';
 import { PUBLIC_START_DATE } from '$env/static/public';
+import { FlatData } from '$lib/flatData';
 
 const { app_token, user_token, account_name } = env;
 
@@ -19,38 +20,43 @@ export const load: PageServerLoad = async ({ params, setHeaders }) => {
 	const account = accounts.find((account) => account.name === account_name);
 
 	if (!account) throw new Error(`No account found with name "${account_name}"`);
-	let startDate = DateTime.now()
-		.setZone(env.TZ || 'Pacific/Auckland')
-		.set({ hour: 0, minute: 0, second: 0, millisecond: 0 })
-		.minus({ days: 80 })
-		.startOf('week');
+	let startDate = FlatData.weekStart(
+		DateTime.now()
+			.setZone(env.TZ || 'Pacific/Auckland')
+			.set({ hour: 0, minute: 0, second: 0, millisecond: 0 })
+			.minus({ days: 80 })
+	);
 	switch (params.time) {
 		case 'days-30':
-			startDate = DateTime.now()
-				.setZone(env.TZ || 'Pacific/Auckland')
-				.set({ hour: 0, minute: 0, second: 0, millisecond: 0 })
-				.minus({ days: 30 })
-				.startOf('week');
+			startDate = FlatData.weekStart(
+				DateTime.now()
+					.setZone(env.TZ || 'Pacific/Auckland')
+					.set({ hour: 0, minute: 0, second: 0, millisecond: 0 })
+					.minus({ days: 30 })
+			);
 			break;
 		case 'start':
-			startDate = DateTime.fromSeconds(parseInt(PUBLIC_START_DATE))
-				.setZone(env.TZ || 'Pacific/Auckland')
-				.set({ hour: 0, minute: 0, second: 0, millisecond: 0 })
-				.minus({ days: 80 })
-				.startOf('week');
+			startDate = FlatData.weekStart(
+				DateTime.fromSeconds(parseInt(PUBLIC_START_DATE))
+					.setZone(env.TZ || 'Pacific/Auckland')
+					.set({ hour: 0, minute: 0, second: 0, millisecond: 0 })
+					.minus({ days: 80 })
+			);
 			break;
 		case 'flat-start':
-			startDate = DateTime.fromSeconds(parseInt(PUBLIC_START_DATE))
-				.setZone(env.TZ || 'Pacific/Auckland')
-				.set({ hour: 0, minute: 0, second: 0, millisecond: 0 })
-				.startOf('week');
+			startDate = FlatData.weekStart(
+				DateTime.fromSeconds(parseInt(PUBLIC_START_DATE))
+					.setZone(env.TZ || 'Pacific/Auckland')
+					.set({ hour: 0, minute: 0, second: 0, millisecond: 0 })
+			);
 			break;
 		default:
 			if (params.time) {
-				const newStartDate = DateTime.fromFormat(params.time, 'yyyy-MM-dd')
-					.setZone(env.TZ || 'Pacific/Auckland')
-					.set({ hour: 0, minute: 0, second: 0, millisecond: 0 })
-					.startOf('week');
+				const newStartDate = FlatData.weekStart(
+					DateTime.fromFormat(params.time, 'yyyy-MM-dd')
+						.setZone(env.TZ || 'Pacific/Auckland')
+						.set({ hour: 0, minute: 0, second: 0, millisecond: 0 })
+				);
 				if (newStartDate && newStartDate > DateTime.now().minus({ years: 1 })) {
 					startDate = newStartDate;
 				}

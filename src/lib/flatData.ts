@@ -1,7 +1,12 @@
 import { env } from '$env/dynamic/public';
 import type { Transaction, TransactionType } from 'akahu';
 import type { AccountBalance, AccountRefreshState } from 'akahu/dist/models/accounts';
-import { DateTime } from 'luxon';
+import { DateTime, Settings } from 'luxon';
+Settings.defaultWeekSettings = {
+	firstDay: 6,
+	minimalDays: 1,
+	weekend: [6, 7]
+};
 
 export const landlord = env.PUBLIC_LANDLORD;
 
@@ -31,6 +36,9 @@ export class Person {
 	get balance(): number {
 		return this.myBalanceAt(DateTime.now());
 	}
+	myRentAt(date: DateTime): number {
+		return this.rent.find((r) => r.end_date === -1 || r.end_date >= date.toSeconds())?.amount || 0;
+	}
 	myBalanceAt(date: DateTime): number {
 		const txs = this.state.txs.filter(
 			(tx) =>
@@ -38,8 +46,10 @@ export class Person {
 				DateTime.fromISO(tx.date) <= date &&
 				DateTime.fromISO(tx.date) >= this.start
 		);
-		const startDate = this.state.firstDate < this.start ? this.start : this.state.firstDate;
-		console.log(this.state.firstDate.toSeconds(), this.balanceAdjust);
+		const startDate = FlatData.weekStart(
+			this.state.firstDate < this.start ? this.start : this.state.firstDate
+		);
+		// console.log(this.state.firstDate.toSeconds(), this.balanceAdjust);
 		return (
 			Math.round(
 				txs.reduce(
@@ -57,13 +67,7 @@ export class Person {
 									(acc, _, i) => {
 										// First, get the date of the start of the week
 										const weekStart = startDate.plus({ weeks: i });
-										return (
-											acc +
-											(this.rent.find(
-												(r) => r.end_date === -1 || r.end_date >= weekStart.toSeconds()
-											)?.amount || 0) +
-											utility_cost
-										);
+										return acc + this.myRentAt(weekStart) + utility_cost;
 									},
 									0
 								)
@@ -261,9 +265,20 @@ export class FlatData {
 	get lastDate() {
 		return DateTime.now();
 	}
+	/**
+	 * Get the start of the week that the date is in
+	 * In our flat, weeks start on a satuday
+	 **/
+	static weekStart(date: DateTime) {
+		return date.startOf('week', { useLocaleWeeks: true });
+		// .minus({ days: 2 });
+	}
+	weekStart(date: DateTime) {
+		return FlatData.weekStart(date);
+	}
 	get weeks() {
 		const weeks = [];
-		let week = this.firstDate.startOf('week');
+		let week = FlatData.weekStart(this.firstDate);
 		while (week < this.lastDate) {
 			weeks.push(new Week(this, week));
 			week = week.plus({ weeks: 1 });

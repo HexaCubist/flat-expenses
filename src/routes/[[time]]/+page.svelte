@@ -45,7 +45,10 @@
 
 	$: data = $page.data as PageData;
 
-	$: flatData = new FlatData(data, { showAllTime: !!$page.params.time, startDate: DateTime.fromISO($page.data.startDate) });
+	$: flatData = new FlatData(data, {
+		showAllTime: !!$page.params.time,
+		startDate: DateTime.fromISO($page.data.startDate)
+	});
 
 	const formatDollars = new Intl.NumberFormat('en-US', {
 		style: 'currency',
@@ -217,7 +220,9 @@
 							<th>
 								{person.name}
 								<br />
-								🏡{formatDollars.format(person.rent)} 🔋{formatDollars.format(utility_cost)}
+								🏡{formatDollars.format(person.rent[person.rent.length - 1].amount)} 🔋{formatDollars.format(
+									utility_cost
+								)}
 								<div class="float-right">
 									{#if person.balance > 0}
 										<span class="badge-simple badge-success">
@@ -242,7 +247,23 @@
 				</thead>
 				<tbody>
 					{#each flatData.weeks.toReversed() as week, weekIndex}
-						<tr>
+						{@const newRents = flatData.people.map((p) =>
+							p.rent.find(
+								(rent) =>
+									rent.end_date <= week.end.toSeconds() && rent.end_date >= week.start.toSeconds()
+							)
+						)}
+						{@const rentChanged = newRents.some((r) => r)}
+						<tr
+							class="border-dashed"
+							class:border-t-2={rentChanged}
+							class:border-t-blue-500={rentChanged}
+							title={rentChanged
+								? `Rent Changed: ${newRents
+										.map((r) => (r ? formatDollars.format(r.amount) : 'N/A'))
+										.join(', ')}`
+								: undefined}
+						>
 							<th title="Week starting {week.start.toLocaleString()}">
 								{week.start.toRelative({ unit: 'weeks' })}
 								<br />
@@ -262,7 +283,8 @@
 								{@const balance = person.myBalanceAt(week.end)}
 								{@const weekTx = person.myTxsInRange(week)}
 								{@const weekSum = weekTx.reduce((acc, tx) => acc + tx.amount, 0)}
-								{@const hasBalance = weekSum - utility_cost - (person.rent || 0) >= 0}
+								{@const hasBalance =
+									weekSum - utility_cost - (person.myRentAt(week.start) || 0) >= 0}
 								{#if person.start > week.end}
 									<td class="relative leading-6 align-middle text-center select-none">
 										<span class="text-sm font-light text-gray-300 italic">
@@ -299,6 +321,8 @@
 											class="bg-base-200 w-full -ml-2 -mr-2 mt-2 relative p-1 rounded-t text-xs text-base-content text-opacity-70 font-bold"
 										>
 											Total: {formatDollars.format(weekSum)}
+											<br />
+											Rent: {formatDollars.format(person.myRentAt(week.start))}
 											<br />
 											Balance: {formatDollars.format(balance)}
 										</div>
