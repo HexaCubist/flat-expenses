@@ -35,7 +35,7 @@
 
 <style lang="postcss">
 	:global(body) {
-		@apply bg-cover bg-center min-h-screen;
+		@apply bg-cover bg-center min-h-screen bg-fixed;
 		background-image: url('./assets/flat.webp');
 	}
 </style>
