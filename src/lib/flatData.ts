@@ -31,7 +31,8 @@ export class Person {
 		public rent: RentAdjustment[],
 		public start: DateTime,
 		public balanceAdjust: BalanceAdjustment[],
-		public account: string
+		public account: string,
+		public ignore_txs: string[] = []
 	) {}
 	get balance(): number {
 		return this.myBalanceAt(DateTime.now());
@@ -43,6 +44,7 @@ export class Person {
 		const txs = this.state.txs.filter(
 			(tx) =>
 				tx.person === this &&
+				!this.ignore_txs.some((i) => tx.description.includes(i)) &&
 				DateTime.fromISO(tx.date) <= date &&
 				DateTime.fromISO(tx.date) >= this.start
 		);
@@ -77,7 +79,9 @@ export class Person {
 		);
 	}
 	myTxsInRange(t: TimePeriod): FlatTransaction[] {
-		return t.txs.filter((tx) => tx.person === this);
+		return t.txs.filter(
+			(tx) => tx.person === this && !this.ignore_txs.some((i) => tx.description.includes(i))
+		);
 	}
 }
 
@@ -211,6 +215,7 @@ type PeopleEnvMap = Record<
 		start_date: number;
 		balance_adjustments: BalanceAdjustment[];
 		search_name: string;
+		ignore_txs?: string[];
 	}
 >;
 
@@ -242,7 +247,8 @@ export class FlatData {
 				info.rent,
 				DateTime.fromSeconds(info.start_date),
 				info.balance_adjustments,
-				info.search_name
+				info.search_name,
+				info.ignore_txs
 			);
 		});
 		this.txs = data.transactions
