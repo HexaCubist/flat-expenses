@@ -5,9 +5,7 @@ const fetch = require('node-fetch');
 const { parse } = require('node-html-parser');
 const dayjs = require('dayjs');
 const minMax = require('dayjs/plugin/minMax');
-const LocalizedFormat = require('dayjs/plugin/LocalizedFormat');
 dayjs.extend(minMax);
-dayjs.extend(LocalizedFormat);
 
 const sendMessage = async () => {
 	const thread = process.env.FB_THREAD;
@@ -45,15 +43,12 @@ const sendMessage = async () => {
 		api.sendMessage(message, thread);
 	} else {
 		console.log(
-			`The bins aren't going out tonight. The next time is ${nextDate.format(
-				'L LT'
-			)}. The current time is ${now.format('L LT')} and will trigger on ${nextDate
-				.subtract(1, 'd')
-				.format('L LT')}. The message will be ${prefix}:${listOfBins.join(
+			`The bins aren't going out tonight. The next time is ${nextDate}. The current time is ${now} and will trigger on ${nextDate.subtract(
+				1,
+				'd'
+			)}. The message will be ${prefix}:${listOfBins.join(
 				','
-			)}. Details: Rubbish:${rubbishDay.format('L LT')}, Scrap:${scrapDay.format(
-				'L LT'
-			)}, Recycling:${recyclingDay.format('L LT')}`
+			)}. Details: Rubbish:${rubbishDay}, Scrap:${scrapDay}, Recycling:${recyclingDay}`
 		);
 	}
 };
